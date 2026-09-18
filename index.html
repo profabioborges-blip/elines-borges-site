@@ -403,6 +403,154 @@
   </div>
 </section>
 
+<!-- ============ TRIAGEM ============ -->
+<section id="triagem" style="padding:96px 0; background:var(--cream-2);">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Não sabe por onde começar?</p>
+      <h2>Responda 3 perguntas rápidas</h2>
+      <p>Sem compromisso — isso só ajuda a Dra. Elines a entender sua situação antes da conversa. Não substitui uma análise do seu caso.</p>
+    </div>
+    <div id="triagem-card" style="background:var(--paper); border:1px solid var(--line); border-radius:4px; padding:40px; max-width:680px;"></div>
+  </div>
+</section>
+
+<style>
+  #triagem .tg-progress{ display:flex; gap:6px; margin-bottom:28px; }
+  #triagem .tg-progress span{ height:4px; flex:1; background:var(--line); border-radius:2px; transition:background .2s ease; }
+  #triagem .tg-progress span.done{ background:var(--gold-600); }
+  #triagem .tg-eyebrow{ font-family:var(--label); font-size:12.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold-700); font-weight:700; margin-bottom:14px; }
+  #triagem h3.tg-question{ font-family:var(--display); font-size:24px; color:var(--navy-900); margin:0 0 24px; line-height:1.35; }
+  #triagem .tg-area-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  @media (max-width:520px){ #triagem .tg-area-grid{ grid-template-columns:1fr; } }
+  #triagem .tg-option, #triagem .tg-area-btn{
+    display:block; width:100%; text-align:left; background:var(--cream); border:1px solid var(--line);
+    border-radius:4px; padding:16px 18px; font-family:var(--body); font-size:15.5px; color:var(--navy-900);
+    cursor:pointer; margin-bottom:10px; transition:border-color .15s ease, background .15s ease;
+  }
+  #triagem .tg-option:hover, #triagem .tg-area-btn:hover{ border-color:var(--gold-600); background:var(--gold-100); }
+  #triagem .tg-area-btn{ margin-bottom:0; font-weight:600; }
+  #triagem .tg-back{ display:inline-block; margin-top:6px; font-size:13.5px; color:var(--ink-soft); background:none; border:none; cursor:pointer; text-decoration:underline; padding:0; }
+  #triagem .tg-summary{ background:var(--cream); border-left:3px solid var(--gold-600); padding:18px 20px; margin-bottom:26px; font-size:14.5px; color:var(--ink-soft); line-height:1.6; }
+  #triagem .tg-summary strong{ color:var(--navy-900); }
+  #triagem .tg-cta{
+    display:inline-flex; align-items:center; gap:10px; background:var(--navy-900); color:#fff; text-decoration:none;
+    padding:16px 28px; border-radius:4px; font-family:var(--label); font-weight:600; font-size:15px;
+  }
+  #triagem .tg-cta:hover{ background:var(--navy-800); }
+</style>
+
+<script>
+(function(){
+  var WHATS_NUMERO = "5519998336416";
+  var AREAS = {
+    trabalhista: {
+      label: "Trabalhista",
+      perguntas: [
+        { texto: "Qual a sua situação hoje?", opcoes: ["Fui demitido recentemente", "Ainda trabalho na empresa", "Saí há mais de um ano", "Trabalho sem carteira assinada"] },
+        { texto: "Você recebeu as verbas da rescisão (aviso prévio, FGTS, 13º, férias)?", opcoes: ["Recebi tudo, mas tenho dúvida", "Recebi só uma parte", "Não recebi nada", "Não sei dizer"] },
+        { texto: "Tem algo além disso envolvido?", opcoes: ["Só a rescisão mesmo", "Horas extras não pagas", "Assédio moral", "Acidente de trabalho"] }
+      ]
+    },
+    previdenciario: {
+      label: "Previdenciário",
+      perguntas: [
+        { texto: "Qual sua situação com o INSS?", opcoes: ["Quero dar entrada em um benefício", "Tive um benefício negado", "Já recebo um benefício e quero revisar", "Não sei se tenho direito a algo"] },
+        { texto: "Que tipo de benefício está em jogo?", opcoes: ["Aposentadoria", "Auxílio-doença / incapacidade", "Auxílio-acidente", "Não sei dizer"] },
+        { texto: "Em que ponto está o pedido?", opcoes: ["Ainda não dei entrada", "Já protocolei, aguardando resposta", "Já foi negado", "Recebo o benefício há tempos"] }
+      ]
+    },
+    familia: {
+      label: "Família",
+      perguntas: [
+        { texto: "Qual assunto você precisa resolver?", opcoes: ["Divórcio", "Pensão alimentícia", "Guarda dos filhos", "Inventário"] },
+        { texto: "Existe acordo entre as partes envolvidas?", opcoes: ["Sim, concordamos nos pontos principais", "Não, há divergência", "Ainda não conversamos sobre isso"] },
+        { texto: "Há filhos menores de idade envolvidos?", opcoes: ["Sim", "Não"] }
+      ]
+    },
+    empresarial: {
+      label: "Empresarial",
+      perguntas: [
+        { texto: "O que sua empresa precisa agora?", opcoes: ["Revisar contratos de trabalho", "Orientação preventiva (evitar processos)", "Já tenho um processo em andamento", "Outro assunto jurídico"] },
+        { texto: "Quantos funcionários a empresa tem, aproximadamente?", opcoes: ["Até 5", "De 6 a 20", "Mais de 20", "Nenhum ainda"] }
+      ]
+    }
+  };
+  var state = { areaKey: null, passo: 0, respostas: [] };
+  var card = document.getElementById("triagem-card");
+  function totalPassos(){ return state.areaKey ? AREAS[state.areaKey].perguntas.length + 1 : 1; }
+  function renderProgress(atual, total){
+    var html = '<div class="tg-progress">';
+    for (var i = 0; i < total; i++) html += '<span class="' + (i < atual ? 'done' : '') + '"></span>';
+    return html + '</div>';
+  }
+  function renderSelecaoArea(){
+    var html = renderProgress(0, 1);
+    html += '<p class="tg-eyebrow">Passo 1</p>';
+    html += '<h3 class="tg-question">O seu caso é sobre?</h3>';
+    html += '<div class="tg-area-grid">';
+    Object.keys(AREAS).forEach(function(key){
+      html += '<button class="tg-area-btn" data-area="' + key + '">' + AREAS[key].label + '</button>';
+    });
+    html += '</div>';
+    card.innerHTML = html;
+    card.querySelectorAll('[data-area]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        state.areaKey = btn.getAttribute('data-area');
+        state.passo = 0; state.respostas = [];
+        renderPergunta();
+      });
+    });
+  }
+  function renderPergunta(){
+    var area = AREAS[state.areaKey];
+    var pergunta = area.perguntas[state.passo];
+    var total = totalPassos();
+    var html = renderProgress(state.passo + 1, total);
+    html += '<p class="tg-eyebrow">' + area.label + ' · Passo ' + (state.passo + 2) + ' de ' + total + '</p>';
+    html += '<h3 class="tg-question">' + pergunta.texto + '</h3>';
+    pergunta.opcoes.forEach(function(op, idx){
+      html += '<button class="tg-option" data-idx="' + idx + '">' + op + '</button>';
+    });
+    html += '<button class="tg-back" id="tg-voltar">← Voltar</button>';
+    card.innerHTML = html;
+    card.querySelectorAll('.tg-option').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var idx = parseInt(btn.getAttribute('data-idx'), 10);
+        state.respostas[state.passo] = { pergunta: pergunta.texto, resposta: pergunta.opcoes[idx] };
+        if (state.passo < area.perguntas.length - 1) { state.passo++; renderPergunta(); }
+        else { renderResumo(); }
+      });
+    });
+    document.getElementById('tg-voltar').addEventListener('click', function(){
+      if (state.passo === 0) renderSelecaoArea();
+      else { state.passo--; renderPergunta(); }
+    });
+  }
+  function montarMensagemWhatsApp(){
+    var area = AREAS[state.areaKey];
+    var msg = "Olá! Vim pelo site e gostaria de uma orientação sobre " + area.label.toLowerCase() + ".\n\n";
+    state.respostas.forEach(function(r){ msg += "• " + r.pergunta + " " + r.resposta + "\n"; });
+    return encodeURIComponent(msg);
+  }
+  function renderResumo(){
+    var total = totalPassos();
+    var html = renderProgress(total, total);
+    html += '<p class="tg-eyebrow">Pronto!</p>';
+    html += '<h3 class="tg-question">Aqui está o que você respondeu:</h3>';
+    html += '<div class="tg-summary">';
+    state.respostas.forEach(function(r){ html += '<div><strong>' + r.pergunta + '</strong><br>' + r.resposta + '</div><br>'; });
+    html += '</div>';
+    html += '<p style="font-size:14px; color:var(--ink-soft); margin-bottom:22px;">Isso é só um ponto de partida — cada caso tem particularidades que só uma conversa direta esclarece.</p>';
+    html += '<a class="tg-cta" target="_blank" rel="noopener" href="https://wa.me/' + WHATS_NUMERO + '?text=' + montarMensagemWhatsApp() + '">Enviar pra Dra. Elines no WhatsApp →</a>';
+    html += '<br><button class="tg-back" id="tg-recomecar" style="margin-top:18px;">Recomeçar</button>';
+    card.innerHTML = html;
+    document.getElementById('tg-recomecar').addEventListener('click', renderSelecaoArea);
+  }
+  renderSelecaoArea();
+})();
+</script>
+
 <!-- ============ CTA ============ -->
 <section class="cta-band" id="contato">
   <div class="wrap">
