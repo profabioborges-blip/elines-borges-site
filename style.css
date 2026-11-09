@@ -11,7 +11,7 @@
   --navy-800: #1a3557;
   --navy-700: #274670;
   --navy-100: #e7ecf3;
-  --gold-700: #96702f;
+  --gold-700: #85611f;
   --gold-600: #b6873f;
   --gold-500: #c99c4f;
   --gold-300: #e3c589;
@@ -175,8 +175,6 @@ header.site{
     width:40px; height:40px; border:1px solid var(--line); background:none; border-radius:var(--radius); cursor:pointer;
   }
   .nav-cta .btn-ghost{ display:none; }
-  .nav-cta .btn-gold{ display:none; }
-  .brand-word{ font-size:16px; }
 }
 
 /* -------------------- hero -------------------- */
@@ -288,7 +286,8 @@ header.site{
   background: var(--paper); border:1px solid var(--line); padding: 30px;
   border-radius: var(--radius);
 }
-.sobre-card h4{
+.sobre-card .card-title{ margin-top:0; }
+.sobre-card .card-title{
   font-family: var(--label); font-size:12.5px; letter-spacing:.12em; text-transform:uppercase;
   color: var(--gold-700); margin-bottom:14px;
 }
@@ -318,7 +317,7 @@ header.site{
 }
 .area-card:hover{ background: var(--cream-2); }
 .area-num{
-  font-family: var(--display); font-size:13px; color: var(--gold-600); margin-bottom:18px; letter-spacing:.06em;
+  font-family: var(--display); font-size:13px; color: var(--gold-700); margin-bottom:18px; letter-spacing:.06em;
 }
 .area-card h3{ font-size:20px; margin-bottom:10px; }
 .area-card p{ font-size:14.5px; color: var(--ink-soft); flex:1; }
@@ -390,7 +389,7 @@ footer.site{
 .footer-grid{ display:grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
 @media (max-width: 780px){ .footer-grid{ grid-template-columns: 1fr 1fr; } }
 @media (max-width: 500px){ .footer-grid{ grid-template-columns: 1fr; } }
-footer.site h5{
+footer.site h5, footer.site h3{
   font-family: var(--label); font-size:12px; letter-spacing:.12em; text-transform:uppercase;
   color: var(--gold-500); margin-bottom:16px; font-weight:700;
 }
